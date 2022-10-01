@@ -1,5 +1,5 @@
 <template>
-  <div class="departments-container">
+  <div v-loading="loading" class="departments-container">
     <div class="app-container">
       <!-- 组织架构内容,头部 -->
       <el-card class="tree-card">
@@ -53,7 +53,8 @@ export default {
         label: 'name' // 表示 从这个属性显示内容
       },
       showDialog: false, // 显示窗体
-      node: null // 记录当前点击的部门
+      node: null, // 记录当前点击的部门
+      loading: false // 用来控制进度弹层的显示和隐藏
     }
   },
   created() {
@@ -61,10 +62,12 @@ export default {
   },
   methods: {
     async getDepartments() {
+      this.loading = true
       const result = await getDepartments()
       this.company = { name: result.companyName, manager: '负责人', id: '' }// 这里定义一个空串  因为 它是根 所有的子节点的数据pid 都是 ""
       this.departs = tranListToTreeDate(result.depts, '')
       // console.log(result)
+      this.loading = false
     },
     // 监听tree-tools中触发的点击添加子部门事件
     addDepts(node) {
