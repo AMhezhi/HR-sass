@@ -11,7 +11,7 @@
         <template slot="after">
           <el-button size="small" type="warning" @click="$router.push('/import?type=user')">导入excel</el-button>
           <el-button size="small" type="danger" @click="exportData">导出excel</el-button>
-          <el-button size="small" type="primary" @click="showDialog = true">新增员工</el-button>
+          <el-button :disabled="!checkPermission('POINT-USER-UPDATE')" size="small" type="primary" @click="showDialog = true">新增员工</el-button>
         </template>
       </PageTools>
 
@@ -52,7 +52,7 @@
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
-              <el-button type="text" size="small">角色</el-button>
+              <el-button type="text" size="small" @click="editRole(row.id)">角色</el-button>
               <el-button type="text" size="small" @click="deleteEmployee(row.id)">删除</el-button>
             </template>
           </el-table-column>
@@ -77,6 +77,8 @@
           <canvas ref="myCanvas" />
         </el-row>
       </el-dialog>
+      <!-- 放置分配权限组件 -->
+      <AssignRole ref="assignRole" :show-role-dialog.sync=" showRoleDialog" :user-id="userId" />
     </div>
   </div>
 </template>
@@ -88,9 +90,11 @@ import addEmployess from './components/add-employess.vue'
 // 在vue文件中引入,export导出的，你若要import必须加上{}; export default不需要
 import { formatDate } from '@/filters'
 import QrCode from 'qrcode'
+import AssignRole from './components/assign-role.vue'
 export default {
   components: {
-    addEmployess
+    addEmployess,
+    AssignRole
   },
   data() {
     return {
@@ -102,7 +106,9 @@ export default {
       },
       loading: false,
       showDialog: false, // 默认关闭弹层
-      showCodeDialog: false
+      showCodeDialog: false,
+      showRoleDialog: false, // 显示分配角色权限弹层
+      userId: null
     }
   },
   created() {
@@ -196,19 +202,29 @@ export default {
       })
       // return rows.map(item => Object.keys(headers).map(key => item[headers[key]]))
     },
+    // 显示二维码方法
     showQrCode(url) {
-      // url存在的情况下 才弹出层
-      if (url) {
-        this.showCodeDialog = true // 数据更新了 但是我的弹层会立刻出现吗 ？页面的渲染是异步的！！！！
-        // 有一个方法可以在上一次数据更新完毕，页面渲染完毕之后
+      if (url && url.trim()) {
+        this.showCodeDialog = true // 打开二维码弹层
+        // 页面的渲染是异步的  状态变了 页面会立刻变化吗  页面立刻能得到dom？  ！！！ no
+        // nextTick总是会等到当前的数据更新完毕 并且渲染完毕之后 执行
+
+        // setTimeout(,0) 异步函数总是等到同步代码执行完毕
+        // this.$nextTick 和 Vue.nextTick()
         this.$nextTick(() => {
-          // 此时可以确认已经有ref对象了
-          QrCode.toCanvas(this.$refs.myCanvas, url) // 将地址转化成二维码
-          // 如果转化的二维码后面信息 是一个地址的话 就会跳转到该地址 如果不是地址就会显示内容
+          // 此时该函数执行时 一定是上一次的更新执行完毕了
+          // 此时一定能保证拿到canvas
+          QrCode.toCanvas(this.$refs.myCanvas, url) // 转化二维码
         })
       } else {
-        this.$message.warning('该用户还未上传头像')
+        this.$message.warning('当前用户没有头像')
       }
+    },
+    async editRole(id) {
+      // 弹出层
+      this.userId = id // props传值 是异步的
+      await this.$refs.assignRole.getUserDetailById(id) // 父组件调用子组件方法
+      this.showRoleDialog = true
     }
   }
 }

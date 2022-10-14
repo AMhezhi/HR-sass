@@ -14,6 +14,7 @@ import router from './router'
 import Component from '@/components'
 import * as directives from '@/directives'
 import * as filters from '@/filters'
+import checkPermission from '@/mixin/checkPermission'
 import '@/icons' // icon
 import '@/permission' // permission control
 
@@ -49,6 +50,7 @@ Object.keys(filters).forEach(key => {
 })
 
 Vue.use(Component) // 注册自己的插件
+Vue.mixin(checkPermission)
 Vue.config.productionTip = false
 
 new Vue({
