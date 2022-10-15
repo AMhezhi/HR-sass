@@ -11,7 +11,7 @@
         <template slot="after">
           <el-button size="small" type="warning" @click="$router.push('/import?type=user')">导入excel</el-button>
           <el-button size="small" type="danger" @click="exportData">导出excel</el-button>
-          <el-button :disabled="!checkPermission('POINT-USER-UPDATE')" size="small" type="primary" @click="showDialog = true">新增员工</el-button>
+          <el-button size="small" :disabled="!checkPermission('aa')" type="primary" @click="showDialog = true">新增员工</el-button>
         </template>
       </PageTools>
 

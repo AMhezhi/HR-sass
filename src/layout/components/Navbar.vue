@@ -8,6 +8,12 @@
     <!-- <breadcrumb class="breadcrumb-container" /> -->
 
     <div class="right-menu">
+      <!-- 放置全屏插件 -->
+      <screen-full class="right-menu-item" />
+      <!-- 放置主题切换全屏插件 -->
+      <theme-picker class="right-menu-item" />
+      <!-- 放置语言切换组件 -->
+      <lang-select class="right-menu-item" />
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img v-imageerror="defaultImg" :src="staffPhoto" class="user-avatar">
@@ -36,6 +42,7 @@
 import { mapGetters } from 'vuex'
 // import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+// import Lang from '@/components/lang/index.vue'
 
 export default {
   components: {
@@ -138,7 +145,7 @@ export default {
       height: 100%;
       font-size: 18px;
       color: #5a5e66;
-      vertical-align: text-bottom;
+      vertical-align: middle;
 
       &.hover-effect {
         cursor: pointer;
